@@ -5,7 +5,7 @@ import os
 from sklearn.model_selection import train_test_split
 
 if __name__ == "__main__":
-  filename = "data/shots_2021.zip"
+  filename = "data/raw/shots_2021.zip"
   shots_2021 = pd.read_csv(zipfile.ZipFile(filename).open("shots_2021.csv"))
 
   # list of columns to include
@@ -24,11 +24,17 @@ if __name__ == "__main__":
 
   shots_2021 = shots_2021.drop(['homeEmptyNet','homeTeamGoals','awayEmptyNet','awayTeamGoals' ],axis = 1)
 
-  X = shots_2021.drop('goal', axis = 1 )
-  y = shots_2021['goal']
+  goal_df = shots_2021.pop('goal')
+  shots_2021['goal'] = goal_df
 
-  X_train, X_test, y_train, y_test  = train_test_split(X,y,test_size = 0.5, random_state = 123)
+  train_df, test_df  = train_test_split(shots_2021,test_size = 0.5, random_state = 123)
 
-  output = 'data/processed/dummy.csv'
-  os.makedirs(os.path.dirname(output),exist_ok=True)
+  output_location='data/pre_processed/'
   
+  try:
+      train_df.to_csv(output_location+'train_df.csv', index = False)
+      test_df.to_csv(output_location+'test_df.csv', index = False)
+  except:
+      os.makedirs(os.path.dirname(output_location+'train_df.csv'),exist_ok=True)
+      train_df.to_csv(output_location+'train_df.csv', index = False)
+      test_df.to_csv(output_location+'test_df.csv', index = False)
