@@ -13,7 +13,7 @@ if __name__ == "__main__":
         print("Website at the provided url does not exist.")
         print(req)
 
-    output = 'data/shots_2021.zip'
+    output = 'data/raw/shots_2021.zip'
     
     try:
         with open(output, 'wb') as f:
