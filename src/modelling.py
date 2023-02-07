@@ -47,3 +47,21 @@ if __name__ == "__main__":
     lr_log_loss = log_loss(y_test,pipe_lr.predict_proba(X_test)[:,1])
     lr_roc = roc_auc_score(y_test, pipe_lr.predict_proba(X_test)[:, 1])
 
+#gradient boosting
+param_grid = {
+    'gradientboostingclassifier__min_samples_split': [100, 250, 500],
+    'gradientboostingclassifier__max_depth': [3, 4, 5]
+}
+
+pip_gbc_unopt = make_pipeline(preprocessor, GradientBoostingClassifier(random_state=123))
+
+pip_gbc = GridSearchCV(pip_gbc_unopt, param_grid=param_grid, cv=10)
+
+pip_gbc.fit(X_train, y_train) 
+
+gbc_train_score = pip_gbc.score(X_train,y_train)
+gbc_test_score = pip_gbc.score(X_test,y_test)
+gbc_log_loss = pip_gbc(y_test,pip_gbc.predict_proba(X_test)[:,1])
+gbc_roc = roc_auc_score(y_test, pip_gbc.predict_proba(X_test)[:, 1])
+
+#random forest
