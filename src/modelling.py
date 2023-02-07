@@ -2,6 +2,9 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import (OneHotEncoder, StandardScaler)
+from sklearn.metrics import roc_auc_score, roc_curve, auc, log_loss
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+
 
 if __name__ == "__main__":
 
@@ -61,7 +64,21 @@ pip_gbc.fit(X_train, y_train)
 
 gbc_train_score = pip_gbc.score(X_train,y_train)
 gbc_test_score = pip_gbc.score(X_test,y_test)
-gbc_log_loss = pip_gbc(y_test,pip_gbc.predict_proba(X_test)[:,1])
+gbc_log_loss = log_loss(y_test,pip_gbc.predict_proba(X_test)[:,1])
 gbc_roc = roc_auc_score(y_test, pip_gbc.predict_proba(X_test)[:, 1])
 
 #random forest
+pipe_rf_unopt = make_pipeline(preprocessor, RandomForestClassifier(n_estimators=100, random_state=123))
+
+param_grid = {
+    'randomforestclassifier__min_samples_leaf': [50, 100, 250, 500]
+}
+
+pipe_rf = GridSearchCV(pipe_rf_unopt, param_grid=param_grid, cv=10)
+
+pipe_rf.fit(X_train, y_train)
+
+rf_train_score = pipe_rf.score(X_train,y_train)
+rf_test_score = pipe_rf.score(X_test,y_test)
+rf_log_loss = log_loss(y_test,pipe_rf.predict_proba(X_test)[:,1])
+rf_roc = roc_auc_score(y_test, pipe_rf.predict_proba(X_test)[:, 1])
