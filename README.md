@@ -1,8 +1,6 @@
 # HockeyxG
 
-## Authors
-
-- Lennon Au-Yeung
+Author: Lennon Au-Yeung
 
 This project was created in fulfillment of the blog post requirements for DSCI 542 (Communication and Argumentation), a course in the Master of Data Science program at the University of British Columbia. The link of the blog post can be found [here](https://medium.com/@lennonauyeung/aad521a95819)
 
