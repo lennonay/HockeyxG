@@ -90,12 +90,11 @@ if __name__ == "__main__":
     rf_roc = roc_auc_score(y_test, pipe_rf.predict_proba(X_test)[:, 1])
 
     # save models
-    lr_file = 'src/model/lr_model.pkl'
+    lr_file = 'src/model/pipe_lr.pkl'
+    gbc_file = 'src/model/pipe_gbc.pkl'
+    rf_file = 'src/model/pipe_rf.pkl'
+
     pickle.dump(pipe_lr, open(lr_file, 'wb'))
-
-    gbc_file = 'src/model/gbc_model.pkl'
     pickle.dump(pipe_gbc, open(gbc_file, 'wb'))
-
-    rf_file = 'src/model/rf_model.pkl'
     pickle.dump(pipe_rf, open(rf_file, 'wb'))
 
