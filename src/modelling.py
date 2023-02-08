@@ -47,8 +47,6 @@ if __name__ == "__main__":
         preprocessor, LogisticRegression(penalty='l2', random_state=234, max_iter=10000, tol=.01)
     )
 
-    pipe_lr.fit(X_train, y_train)
-
     pipe_lr = RandomizedSearchCV(pipe_lr, param_dist, n_iter = 10, n_jobs = -1, return_train_score = True)
 
     pipe_lr.fit(X_train, y_train)
@@ -100,3 +98,4 @@ if __name__ == "__main__":
 
     rf_file = 'src/model/rf_model.pkl'
     pickle.dump(pipe_rf, open(rf_file, 'wb'))
+
