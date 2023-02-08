@@ -35,7 +35,8 @@ if __name__ == "__main__":
 
     preprocessor = make_column_transformer(
         (StandardScaler(),numeric_features),
-        (OneHotEncoder(drop="if_binary", dtype=int), binary_features), (make_pipeline(SimpleImputer(strategy="most_frequent"),OneHotEncoder(handle_unknown="ignore")), categorical_features)
+        (OneHotEncoder(drop="if_binary", dtype=int), binary_features),
+        (make_pipeline(SimpleImputer(strategy="most_frequent"),OneHotEncoder(handle_unknown="ignore")), categorical_features)
     )
 
     #logistic regression

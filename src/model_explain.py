@@ -51,9 +51,6 @@ if __name__ == "__main__":
     pipe_gbc = pickle.load(open(gbc_file, 'rb'))
     pipe_rf = pickle.load(open(rf_file, 'rb'))
 
-    result = pipe_lr.score(X_test, y_test)
-    print(result)
-
     preds = {
         "Random Forest": pipe_rf.predict_proba(X_test),
         "Gradient Boosting": pipe_gbc.predict_proba(X_test),
