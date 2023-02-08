@@ -58,45 +58,45 @@ if __name__ == "__main__":
     lr_log_loss = log_loss(y_test,pipe_lr.predict_proba(X_test)[:,1])
     lr_roc = roc_auc_score(y_test, pipe_lr.predict_proba(X_test)[:, 1])
 
-#gradient boosting
-param_grid = {
-    'gradientboostingclassifier__min_samples_split': [100, 250, 500],
-    'gradientboostingclassifier__max_depth': [3, 4, 5]
-}
+    #gradient boosting
+    param_grid = {
+        'gradientboostingclassifier__min_samples_split': [100, 250, 500],
+        'gradientboostingclassifier__max_depth': [3, 4, 5]
+    }
 
-pipe_gbc = make_pipeline(preprocessor, GradientBoostingClassifier(random_state=123))
+    pipe_gbc = make_pipeline(preprocessor, GradientBoostingClassifier(random_state=123))
 
-pipe_gbc = GridSearchCV(pipe_gbc, param_grid=param_grid, cv=10)
+    pipe_gbc = GridSearchCV(pipe_gbc, param_grid=param_grid, cv=10)
 
-pipe_gbc.fit(X_train, y_train) 
+    pipe_gbc.fit(X_train, y_train) 
 
-gbc_train_score = pipe_gbc.score(X_train,y_train)
-gbc_test_score = pipe_gbc.score(X_test,y_test)
-gbc_log_loss = log_loss(y_test,pipe_gbc.predict_proba(X_test)[:,1])
-gbc_roc = roc_auc_score(y_test, pipe_gbc.predict_proba(X_test)[:, 1])
+    gbc_train_score = pipe_gbc.score(X_train,y_train)
+    gbc_test_score = pipe_gbc.score(X_test,y_test)
+    gbc_log_loss = log_loss(y_test,pipe_gbc.predict_proba(X_test)[:,1])
+    gbc_roc = roc_auc_score(y_test, pipe_gbc.predict_proba(X_test)[:, 1])
 
-#random forest
-pipe_rf = make_pipeline(preprocessor, RandomForestClassifier(n_estimators=100, random_state=123))
+    #random forest
+    pipe_rf = make_pipeline(preprocessor, RandomForestClassifier(n_estimators=100, random_state=123))
 
-param_grid = {
-    'randomforestclassifier__min_samples_leaf': [50, 100, 250, 500]
-}
+    param_grid = {
+        'randomforestclassifier__min_samples_leaf': [50, 100, 250, 500]
+    }
 
-pipe_rf = GridSearchCV(pipe_rf, param_grid=param_grid, cv=10)
+    pipe_rf = GridSearchCV(pipe_rf, param_grid=param_grid, cv=10)
 
-pipe_rf.fit(X_train, y_train)
+    pipe_rf.fit(X_train, y_train)
 
-rf_train_score = pipe_rf.score(X_train,y_train)
-rf_test_score = pipe_rf.score(X_test,y_test)
-rf_log_loss = log_loss(y_test,pipe_rf.predict_proba(X_test)[:,1])
-rf_roc = roc_auc_score(y_test, pipe_rf.predict_proba(X_test)[:, 1])
+    rf_train_score = pipe_rf.score(X_train,y_train)
+    rf_test_score = pipe_rf.score(X_test,y_test)
+    rf_log_loss = log_loss(y_test,pipe_rf.predict_proba(X_test)[:,1])
+    rf_roc = roc_auc_score(y_test, pipe_rf.predict_proba(X_test)[:, 1])
 
-# save models
-lr_file = 'model/lr_model.pkl'
-pickle.dump(pipe_lr, open(lr_file, 'wb'))
+    # save models
+    lr_file = 'src/model/lr_model.pkl'
+    pickle.dump(pipe_lr, open(lr_file, 'wb'))
 
-gbc_file = 'model/gbc_model.pkl'
-pickle.dump(pipe_gbc, open(gbc_file, 'wb'))
+    gbc_file = 'src/model/gbc_model.pkl'
+    pickle.dump(pipe_gbc, open(gbc_file, 'wb'))
 
-rf_file = 'model/rf_model.pkl'
-pickle.dump(pipe_rf, open(rf_file, 'wb'))
+    rf_file = 'src/model/rf_model.pkl'
+    pickle.dump(pipe_rf, open(rf_file, 'wb'))
