@@ -9,6 +9,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.impute import SimpleImputer
 from scipy.stats import loguniform
 from sklearn.model_selection import GridSearchCV
+import pickle
 
 
 if __name__ == "__main__":
@@ -37,7 +38,7 @@ if __name__ == "__main__":
         (OneHotEncoder(drop="if_binary", dtype=int), binary_features), (make_pipeline(SimpleImputer(strategy="most_frequent"),OneHotEncoder(handle_unknown="ignore")), categorical_features)
     )
 
-    #linear regression
+    #logistic regression
     param_dist = {
         "logisticregression__C": loguniform(1e-3, 1e3)
     }
@@ -45,6 +46,8 @@ if __name__ == "__main__":
     pipe_lr = make_pipeline(
         preprocessor, LogisticRegression(penalty='l2', random_state=234, max_iter=10000, tol=.01)
     )
+
+    pipe_lr.fit(X_train, y_train)
 
     pipe_lr = RandomizedSearchCV(pipe_lr, param_dist, n_iter = 10, n_jobs = -1, return_train_score = True)
 
@@ -61,16 +64,16 @@ param_grid = {
     'gradientboostingclassifier__max_depth': [3, 4, 5]
 }
 
-pip_gbc = make_pipeline(preprocessor, GradientBoostingClassifier(random_state=123))
+pipe_gbc = make_pipeline(preprocessor, GradientBoostingClassifier(random_state=123))
 
-pip_gbc = GridSearchCV(pip_gbc, param_grid=param_grid, cv=10)
+pipe_gbc = GridSearchCV(pipe_gbc, param_grid=param_grid, cv=10)
 
-pip_gbc.fit(X_train, y_train) 
+pipe_gbc.fit(X_train, y_train) 
 
-gbc_train_score = pip_gbc.score(X_train,y_train)
-gbc_test_score = pip_gbc.score(X_test,y_test)
-gbc_log_loss = log_loss(y_test,pip_gbc.predict_proba(X_test)[:,1])
-gbc_roc = roc_auc_score(y_test, pip_gbc.predict_proba(X_test)[:, 1])
+gbc_train_score = pipe_gbc.score(X_train,y_train)
+gbc_test_score = pipe_gbc.score(X_test,y_test)
+gbc_log_loss = log_loss(y_test,pipe_gbc.predict_proba(X_test)[:,1])
+gbc_roc = roc_auc_score(y_test, pipe_gbc.predict_proba(X_test)[:, 1])
 
 #random forest
 pipe_rf = make_pipeline(preprocessor, RandomForestClassifier(n_estimators=100, random_state=123))
@@ -88,3 +91,12 @@ rf_test_score = pipe_rf.score(X_test,y_test)
 rf_log_loss = log_loss(y_test,pipe_rf.predict_proba(X_test)[:,1])
 rf_roc = roc_auc_score(y_test, pipe_rf.predict_proba(X_test)[:, 1])
 
+# save models
+lr_file = 'model/lr_model.pkl'
+pickle.dump(pipe_lr, open(lr_file, 'wb'))
+
+gbc_file = 'model/gbc_model.pkl'
+pickle.dump(pipe_gbc, open(gbc_file, 'wb'))
+
+rf_file = 'model/rf_model.pkl'
+pickle.dump(pipe_rf, open(rf_file, 'wb'))
