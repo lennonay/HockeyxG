@@ -1,26 +1,7 @@
 import pandas as pd
 import pickle
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
-
-train_df = pd.read_csv('data/pre_processed/train_df.csv')
-test_df = pd.read_csv('data/pre_processed/test_df.csv')
-
-X_train = train_df.drop('goal', axis = 1)
-y_train = train_df['goal']
-
-X_test = test_df.drop('goal', axis = 1)
-y_test = test_df['goal']
-
-lr_file = 'src/model/lr_model.pkl'
-gbc_file = 'src/model/gbc_model.pkl'
-rf_file = 'src/model/rf_model.pkl'
-
-# load the model from disk
-lr_model = pickle.load(open(lr_file, 'rb'))
-result = lr_model.score(X_test, y_test)
-print(result)
-
 
 #adopted from https://github.com/HarryShomer/xG-Model
 def get_roc(actual, predictions):
@@ -48,11 +29,34 @@ def get_roc(actual, predictions):
     plt.plot([0, 1], [0, 1], 'r--', label=' '.join(["Random:", str(.5)]))
 
     plt.legend(title='AUC Score', loc=4)
-    fig.savefig("ROC_xG.png")
+    fig.savefig("results/ROC_xG.png")
 
-#preds = {
-    #"Random Forest": pipe_rf.predict_proba(X_test),
-    #"Gradient Boosting": pip_gbc.predict_proba(X_test),
-    #"Logistic Regression": pipe_lr_unopt.predict_proba(X_test)}
+if __name__ == "__main__":
 
-#get_roc(y_test, preds)
+    train_df = pd.read_csv('data/pre_processed/train_df.csv')
+    test_df = pd.read_csv('data/pre_processed/test_df.csv')
+
+    X_train = train_df.drop('goal', axis = 1)
+    y_train = train_df['goal']
+
+    X_test = test_df.drop('goal', axis = 1)
+    y_test = test_df['goal']
+
+    lr_file = 'src/model/pipe_lr.pkl'
+    gbc_file = 'src/model/pipe_gbc.pkl'
+    rf_file = 'src/model/pipe_rf.pkl'
+
+    # load the model from disk
+    pipe_lr = pickle.load(open(lr_file, 'rb'))
+    pipe_gbc = pickle.load(open(gbc_file, 'rb'))
+    pipe_rf = pickle.load(open(rf_file, 'rb'))
+
+    result = pipe_lr.score(X_test, y_test)
+    print(result)
+
+    preds = {
+        "Random Forest": pipe_rf.predict_proba(X_test),
+        "Gradient Boosting": pipe_gbc.predict_proba(X_test),
+        "Logistic Regression": pipe_lr.predict_proba(X_test)}
+
+    get_roc(y_test, preds)
