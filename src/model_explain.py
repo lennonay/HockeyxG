@@ -2,6 +2,8 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
+import numpy as np
+import altair as alt
 
 #adopted from https://github.com/HarryShomer/xG-Model
 def get_roc(actual, predictions):
@@ -45,11 +47,13 @@ if __name__ == "__main__":
     lr_file = 'src/model/pipe_lr.pkl'
     gbc_file = 'src/model/pipe_gbc.pkl'
     rf_file = 'src/model/pipe_rf.pkl'
+    lr_base_file = 'src/model/pipe_lr_base.pkl'
 
     # load the model from disk
     pipe_lr = pickle.load(open(lr_file, 'rb'))
     pipe_gbc = pickle.load(open(gbc_file, 'rb'))
     pipe_rf = pickle.load(open(rf_file, 'rb'))
+    pipe_lr_base = pickle.load(open(lr_base_file, 'rb'))
 
     preds = {
         "Random Forest": pipe_rf.predict_proba(X_test),
@@ -57,3 +61,33 @@ if __name__ == "__main__":
         "Logistic Regression": pipe_lr.predict_proba(X_test)}
 
     get_roc(y_test, preds)
+
+    categorical_features  = ['shotType', 'lastEventCategory','team', 'shooterLeftRight' ]
+    binary_features = ['isPlayoffGame','shootingTeamEmptyNet', 'defendingTeamEmptyNet']
+
+    numeric_features = ['arenaAdjustedShotDistance',
+    'distanceFromLastEvent',
+    'shotAngle',
+    'xCordAdjusted',
+    'yCordAdjusted','defendingTeamDefencemenOnIce','defendingTeamForwardsOnIce',
+    'defendingTeamGoals', 'shootingTeamDefencemenOnIce','shootingTeamForwardsOnIce','shootingTeamGoals']
+
+    ohe_features = pipe_lr_base.named_steps["columntransformer"].named_transformers_["pipeline"].get_feature_names_out(categorical_features).tolist()
+    feature_names = (numeric_features + binary_features + ohe_features)
+
+    data = {
+        "coefficient": pipe_lr_base.named_steps["logisticregression"].coef_.flatten().tolist(),
+        "magnitude": np.absolute(
+            pipe_lr_base.named_steps["logisticregression"].coef_.flatten().tolist()
+        ),
+    }
+    coef_df = pd.DataFrame(data, index=feature_names).sort_values(
+        "magnitude", ascending=False
+    ).reset_index()
+
+    coef_df.to_csv('results/feature_importance.csv', index = False)
+
+    alt.Chart(coef_df.head(15), title = 'Feature Importance from Logistic Regression').mark_bar().encode(
+    x = 'coefficient',
+    y = alt.Y('index', sort = '-x'),
+    color = alt.Color(scale = alt.Scale(scheme='dark2')))
