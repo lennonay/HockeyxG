@@ -1,11 +1,24 @@
-filename = 'finalized_model.sav'
-pickle.dump(model, open(filename, 'wb'))
- 
-# some time later...
- 
+import pandas as pd
+import pickle
+import matplotlib as plt
+from sklearn.metrics import roc_curve, auc
+
+train_df = pd.read_csv('data/pre_processed/train_df.csv')
+test_df = pd.read_csv('data/pre_processed/test_df.csv')
+
+X_train = train_df.drop('goal', axis = 1)
+y_train = train_df['goal']
+
+X_test = test_df.drop('goal', axis = 1)
+y_test = test_df['goal']
+
+lr_file = 'src/model/lr_model.pkl'
+gbc_file = 'src/model/gbc_model.pkl'
+rf_file = 'src/model/rf_model.pkl'
+
 # load the model from disk
-loaded_model = pickle.load(open(filename, 'rb'))
-result = loaded_model.score(X_test, Y_test)
+lr_model = pickle.load(open(lr_file, 'rb'))
+result = lr_model.score(X_test, y_test)
 print(result)
 
 
@@ -37,9 +50,9 @@ def get_roc(actual, predictions):
     plt.legend(title='AUC Score', loc=4)
     fig.savefig("ROC_xG.png")
 
-preds = {
-    "Random Forest": pipe_rf.predict_proba(X_test),
-    "Gradient Boosting": pip_gbc.predict_proba(X_test),
-    "Logistic Regression": pipe_lr_unopt.predict_proba(X_test)
-}
-get_roc(y_test, preds)
+#preds = {
+    #"Random Forest": pipe_rf.predict_proba(X_test),
+    #"Gradient Boosting": pip_gbc.predict_proba(X_test),
+    #"Logistic Regression": pipe_lr_unopt.predict_proba(X_test)}
+
+#get_roc(y_test, preds)
