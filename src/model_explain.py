@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 import numpy as np
 import altair as alt
+import vl_convert as vlc
 
 #adopted from https://github.com/HarryShomer/xG-Model
 def get_roc(actual, predictions):
@@ -32,6 +33,31 @@ def get_roc(actual, predictions):
 
     plt.legend(title='AUC Score', loc=4)
     fig.savefig("results/ROC_xG.png")
+
+def save_chart(chart, filename, scale_factor=1):
+    #save_chart function reference from Joel Ostblom
+    '''
+    Save an Altair chart using vl-convert
+    
+    Parameters
+    ----------
+    chart : altair.Chart
+        Altair chart to save
+    filename : str
+        The path to save the chart to
+    scale_factor: int or float
+        The factor to scale the image resolution by.
+        E.g. A value of `2` means two times the default resolution.
+    '''
+    #saves altair object as png
+    if filename.split('.')[-1] == 'svg':
+        with open(filename, "w") as f:
+            f.write(vlc.vegalite_to_svg(chart.to_dict()))
+    elif filename.split('.')[-1] == 'png':
+        with open(filename, "wb") as f:
+            f.write(vlc.vegalite_to_png(chart.to_dict(), scale=scale_factor))
+    else:
+        raise ValueError("Only svg and png formats are supported")
 
 if __name__ == "__main__":
 
@@ -87,7 +113,9 @@ if __name__ == "__main__":
 
     coef_df.to_csv('results/feature_importance.csv', index = False)
 
-    alt.Chart(coef_df.head(15), title = 'Feature Importance from Logistic Regression').mark_bar().encode(
+    chart = alt.Chart(coef_df.head(15), title = 'Feature Importance from Logistic Regression').mark_bar().encode(
     x = 'coefficient',
     y = alt.Y('index', sort = '-x'),
     color = alt.Color(scale = alt.Scale(scheme='dark2')))
+
+    save_chart(chart, 'results/feature_importnace.png')
