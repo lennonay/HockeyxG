@@ -26,3 +26,10 @@ Three popular expected goals model have been used in this project, including: Lo
 Using the function from [HarryShomer/xG-Model](https://github.com/HarryShomer/xG-Model), the results was generated below as an ROC curve.
 
 ![](results/ROC_xG.png)
+
+As we can see, after hyperparamter optimization, three models performed quite similar, all outperforming the model of a random choice. 
+
+## Model Explanation
+The feature importance is extracted for the logistic regression model, the top 15 features in terms of magnitued is displayed below.
+
+![](results/feature_importnace.png)
